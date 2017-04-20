@@ -35,7 +35,7 @@ module Fgi
         if !@response[0].nil?
           puts "Found #{@response.count} match(es):"
           @response.each_with_index do |response, i|
-            puts "#{i+1} - #{response['name']}"
+            puts "#{i+1} - #{response['name_with_namespace']}"
           end
           puts "Please insert the number of the current project:"
           @option = STDIN.gets.chomp.to_i
