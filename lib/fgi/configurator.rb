@@ -41,6 +41,7 @@ module Fgi
           req = Net::HTTP.new(@uri.host, @uri.port)
           res = req.request_head(@uri.path)
         rescue Interrupt => int
+          puts %q[Why did you killed me ? :'(]
           exit!
         rescue Exception => e
           puts "\nOops, seems to be a bad url. Try again or quit (quit) :"
@@ -58,6 +59,7 @@ module Fgi
                    end
           exit! if @token == 'quit'
         rescue Interrupt => int
+          puts %q[Why did you killed me ? :'(]
           exit!
         end
         @projects_uri = "#{@config[:url]}/api/v4/projects"
@@ -92,6 +94,7 @@ module Fgi
           project_name = STDIN.gets.chomp
           exit! if project_name == 'quit'
         rescue Interrupt => int
+          puts %q[Why did you killed me ? :'(]
           exit!
         end
 
@@ -119,6 +122,7 @@ module Fgi
         begin
           option = STDIN.gets.chomp.to_i
         rescue Interrupt => int
+          puts %q[Why did you killed me ? :'(]
           exit!
         end
         if (1..results.length+1).include?(option)
