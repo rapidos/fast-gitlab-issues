@@ -53,7 +53,7 @@ module Fgi
         if res.code == '200'
           save_gitlab_token
         else
-          puts "\nOops, seems to be an invalid token. Try again or quit (quit) :"
+          puts "\nOops, seems to be an invalid token. Try again or quit (quit/exit) :"
           puts '--------------------------------------------------------------'
           validate_and_save_gitlab_token
         end
@@ -120,7 +120,7 @@ module Fgi
           end
           validate_option(results)
         else
-          puts "\nOops, we couldn't find a project called #{project_name}. Try again or quit (quit) :"
+          puts "\nOops, we couldn't find a project called #{project_name}. Try again or quit (quit/exit) :"
           puts '-------------------------------------------------------------------'+('-'*project_name.length) # Yes, i'm a perfectionist <3
           search_and_save_project
         end
