@@ -9,7 +9,7 @@ module Fgi
         puts '            Welcome to Fast Gitlab Issues configuration             '
         puts "####################################################################\n\n"
         puts "#### Enter 'quit' or 'exit' at any time to go back to buisness! ####\n\n"
-        
+
         puts 'Please enter your Gitlab Url:'
         validate_and_save_gitlab_uri
 
@@ -36,7 +36,10 @@ module Fgi
                      set_config
                      inline_token
                    end
-          exit! if %w(quit exit).include?(@token)
+          if %w(quit exit).include?(@token)
+            puts 'See you back soon !'
+            exit!
+          end
         rescue Interrupt => int
           puts %q[Why did you killed me ? :'(]
           exit!
@@ -63,7 +66,10 @@ module Fgi
         puts '-----------------------------------'
         begin
           input = STDIN.gets.chomp
-          exit! if %w(quit exit).include?(input)
+          if %w(quit exit).include?(input)
+            puts 'See you back soon !'
+            exit!
+          end
           input = "http://#{input}" if !input.start_with?('http://', 'https://')
           @uri = URI.parse("#{input}/")
           @config[:url] = "#{@uri.scheme}://#{@uri.host}"
@@ -93,7 +99,10 @@ module Fgi
       def search_and_save_project
         begin
           project_name = STDIN.gets.chomp
-          exit! if %w(quit exit).include?(project_name)
+          if %w(quit exit).include?(project_name)
+            puts 'See you back soon !'
+            exit!
+          end
         rescue Interrupt => int
           puts %q[Why did you killed me ? :'(]
           exit!
