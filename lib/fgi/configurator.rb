@@ -27,28 +27,6 @@ module Fgi
         puts "\n####################################################################"
       end
 
-<<<<<<< Updated upstream
-      def validate_and_save_gitlab_uri
-        puts 'example: http://gitlab.example.com/'
-        puts '-----------------------------------'
-        begin
-          input = "#{STDIN.gets.chomp}"
-          exit! if input == 'quit'
-          input = "http://#{input}" if !input.start_with?('http://', 'https://')
-          @uri = URI.parse("#{input}/")
-          @config[:url] = "#{@uri.scheme}://#{@uri.host}"
-          req = Net::HTTP.new(@uri.host, @uri.port)
-          res = req.request_head(@uri.path)
-        rescue Interrupt => int
-          exit!
-        rescue Exception => e
-          puts "\nOops, seems to be a bad url. Try again or quit (quit) :"
-          validate_and_save_gitlab_uri
-        end
-      end
-
-=======
->>>>>>> Stashed changes
       def validate_and_save_gitlab_token(inline_token = nil)
         begin
           @token = if inline_token.nil?
@@ -57,11 +35,7 @@ module Fgi
                      set_config
                      inline_token
                    end
-<<<<<<< Updated upstream
-          exit! if @token == 'quit'
-=======
           exit! if %w(quit exit).include?(@token)
->>>>>>> Stashed changes
         rescue Interrupt => int
           exit!
         end
@@ -117,11 +91,7 @@ module Fgi
       def search_and_save_project
         begin
           project_name = STDIN.gets.chomp
-<<<<<<< Updated upstream
-          exit! if project_name == 'quit'
-=======
           exit! if %w(quit exit).include?(project_name)
->>>>>>> Stashed changes
         rescue Interrupt => int
           exit!
         end
