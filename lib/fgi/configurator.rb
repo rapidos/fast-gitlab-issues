@@ -22,7 +22,8 @@ module Fgi
         puts '----------------------------------------------'
         search_and_save_project
 
-        File.open('.fast_gitlab_issues.yml', 'w') { |f| f.write @config.to_yaml }
+        Fgi::Creator.configuration_file(@config)
+        
         puts "\nYou are now set to work on #{@config[:project_namespaced]}."
         puts 'Your configuration has been saved to .fast_gitlab_issues.yml, enjoy !'
         puts "\n####################################################################"

@@ -21,22 +21,8 @@ module Fgi
       when content.match(/--token/)
         Fgi::Configurator.validate_and_save_gitlab_token(content.strip.split(' ').last)
       else
-        create_issue(content)
+        Fgi::Creator.issue(content)
       end
-    end
-
-    # Get the issue's description and initiate its creation
-    # @param title [String] the issue's title
-    def create_issue(title)
-      puts "\nWrite your issue description right bellow (save and quit with CTRL+D) :"
-      puts "---------------------------------------------------------------------\n\n"
-      begin
-        description = STDIN.read
-      rescue Interrupt => int
-        puts %q[Why did you killed me ? :'(]
-        exit!
-      end
-      Fgi::Executor.new.process_data(title, description)
     end
   end
 end
