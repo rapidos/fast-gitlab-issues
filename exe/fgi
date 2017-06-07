@@ -8,20 +8,42 @@ require_relative '../lib/fgi'
 # extract core logic from here into the gem bin
 module Fgi
   class Command
-    def initialize(content)
+    def initialize(argv)
+
+      # @!group Validations
+      check_if_fgi_is_configured(argv)
+      check_if_user_token_is_set(argv)
+      # @!endgroup
+
       # convert title into a string we can use in a curl request
-      content = content.join(' ')
+      argv = argv.join(' ')
       case
-      when content.empty?
+      when argv.empty?
         Fgi::Helper.run
-      when content.match(/--help/)
+      when argv.match(/--help/)
         Fgi::Helper.run
-      when content.match(/--config/)
+      when argv.match(/--config/)
         Fgi::Configurator.run
-      when content.match(/--token/)
-        Fgi::Configurator.validate_and_save_gitlab_token(content.strip.split(' ').last)
+      when argv.match(/--token/)
+        Fgi::Configurator.validate_and_save_gitlab_token(argv.strip.split(' ').last)
       else
-        Fgi::Creator.issue(content)
+        Fgi::GitlabRequest.post_issue(argv)
+      end
+    end
+
+    private
+
+    def check_if_fgi_is_configured(argv)
+      if !argv.include?('--config') && !File.exists?(CONFIG_FILE)
+        puts %q"You didn't configure FGI. Try : fgi --config"
+        exit(-1)
+      end
+    end
+
+    def check_if_user_token_is_set(argv)
+      if !argv.include?('--token') && !File.exists?(TOKEN_FILE)
+        puts %q"You didn't configure FGI. Try : fgi --token <your token>"
+        exit(-1)
       end
     end
   end

@@ -2,7 +2,12 @@ module Fgi
   class Config
     class << self
       def load(source)
-        @config = { :url => nil, :project_gitlab_id => nil, :project_namespaced => nil }
+        @config = {
+          url: nil,
+          project_gitlab_id: nil,
+          project_namespaced: nil,
+          projects_url: nil,
+        }
 
         Fgi::GenerateFile.new(@config) if !File.exist?(source)
         Fgi::GenerateFile.token if !File.exist?('.gitlab_access_token')
@@ -26,7 +31,12 @@ module Fgi
       end
 
       def current
-        @config ||= { :url => nil, :project_gitlab_id => nil, :project_namespaced => nil }
+        @config ||= {
+          url: nil,
+          project_gitlab_id: nil,
+          project_namespaced: nil,
+          projects_url: nil
+        }
       end
     end
   end

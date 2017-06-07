@@ -23,7 +23,7 @@ module Fgi
         search_and_save_project
 
         Fgi::Creator.configuration_file(@config)
-        
+
         puts "\nYou are now set to work on #{@config[:project_namespaced]}."
         puts 'Your configuration has been saved to .fast_gitlab_issues.yml, enjoy !'
         puts "\n####################################################################"
@@ -34,20 +34,23 @@ module Fgi
           @token = if inline_token.nil?
                      STDIN.gets.chomp
                    else
-                     set_config
+                     @config = CONFIG # Dirty stuff
+                     @uri = URI.parse(@config[:url])
                      inline_token
                    end
           if %w(quit exit).include?(@token)
             puts 'See you back soon !'
             exit!
           end
+        rescue NameError => ne
+          puts %q"You didn't configure FGI. Try : fgi --config"
         rescue Interrupt => int
-          puts %q[Why did you killed me ? :'(]
+          puts %q"Why did you killed me ? :'("
           exit!
         end
-        @projects_uri = "#{@config[:url]}/api/v4/projects"
+        @config[:projects_url] = "#{@config[:url]}/api/v4/projects"
 
-        req = Net::HTTP::Get.new(@projects_uri)
+        req = Net::HTTP::Get.new(@config[:projects_url])
         req['PRIVATE-TOKEN'] = @token
         res = Net::HTTP.start(@uri.hostname, @uri.port) { |http| http.request(req) }
 
@@ -109,7 +112,7 @@ module Fgi
           exit!
         end
 
-        req = Net::HTTP::Get.new("#{@projects_uri}?search=#{project_name}")
+        req = Net::HTTP::Get.new("#{@config[:projects_url]}?search=#{project_name}")
         req['PRIVATE-TOKEN'] = @token
         res = Net::HTTP.start(@uri.hostname, @uri.port) { |http| http.request(req) }
 
@@ -143,12 +146,6 @@ module Fgi
           puts "\nSorry, the option is out of range. Try again :"
           validate_option(results)
         end
-      end
-
-      def set_config
-        config_file = File.expand_path(CONFIG_FILE)
-        @config = YAML.load_file(config_file)
-        @uri = URI.parse(@config[:url])
       end
 
       def is_git_dir?

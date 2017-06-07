@@ -2,7 +2,7 @@ module Fgi
   class Helper
     class << self
       def run
-        puts "
+        puts '
 Welcome to Fast Gitlab Issues!
 
 The following commands are currently supported:
@@ -20,8 +20,7 @@ $ fgi My awesome title goes here
 
 Vim will open so you can write a description, and upon closing, it will be pushed to gitlab.
 A success message should then appear.
-
-"
+        '
       end
     end
   end
