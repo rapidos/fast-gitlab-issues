@@ -8,35 +8,43 @@ require_relative '../lib/fgi'
 # extract core logic from here into the gem bin
 module Fgi
   class Command
-    def initialize(content)
+    def initialize(argv)
+
+      # @!group Validations
+      check_if_fgi_is_configured(argv)
+      check_if_user_token_is_set(argv)
+      # @!endgroup
+
       # convert title into a string we can use in a curl request
-      content = content.join(' ')
+      argv = argv.join(' ')
       case
-      when content.empty?
+      when argv.empty?
         Fgi::Helper.run
-      when content.include?('--help')
+      when argv.include?('--help')
         Fgi::Helper.run
-      when content.include?('--config')
+      when argv.include?('--config')
         Fgi::Configurator.run
-      when content.include?('--token')
-        Fgi::Configurator.validate_and_save_gitlab_token(content.strip.split(' ').last)
+      when argv.include?('--token')
+        Fgi::Configurator.validate_and_save_gitlab_token(argv.strip.split(' ').last)
       else
-        create_issue(content)
+        Fgi::GitlabRequest.post_issue(argv)
       end
     end
 
-    # Get the issue's description and initiate its creation
-    # @param title [String] the issue's title
-    def create_issue(title)
-      puts "\nWrite your issue description right bellow (save and quit with CTRL+D) :"
-      puts "---------------------------------------------------------------------\n\n"
-      begin
-        description = STDIN.read
-      rescue Interrupt => int
-        puts %q[Why did you killed me ? :'(]
-        exit!
+    private
+
+    def check_if_fgi_is_configured(argv)
+      if !argv.include?('--config') && !File.exists?(CONFIG_FILE)
+        puts %q"You didn't configure FGI. Try : fgi --config"
+        exit(-1)
       end
-      Fgi::Executor.new.process_data(title, description)
+    end
+
+    def check_if_user_token_is_set(argv)
+      if !argv.include?('--token') && !File.exists?(TOKEN_FILE)
+        puts %q"You didn't configure FGI. Try : fgi --token <your token>"
+        exit(-1)
+      end
     end
   end
 end

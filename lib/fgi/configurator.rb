@@ -22,7 +22,7 @@ module Fgi
         puts '----------------------------------------------'
         search_and_save_project
 
-        File.open('.fast_gitlab_issues.yml', 'w') { |f| f.write @config.to_yaml }
+        Fgi::Creator.configuration_file(@config)
 
         puts "\nYou are now set to work on #{@config[:project_namespaced]}."
         puts 'Your configuration has been saved to .fast_gitlab_issues.yml, enjoy !'
@@ -37,20 +37,23 @@ module Fgi
           @token = if inline_token.nil?
                      STDIN.gets.chomp
                    else
-                     set_config
+                     @config = CONFIG # Dirty stuff
+                     @uri = URI.parse(@config[:url])
                      inline_token
                    end
           if %w(quit exit).include?(@token)
             puts 'See you back soon !'
             exit!
           end
+        rescue NameError => ne
+          puts %q"You didn't configure FGI. Try : fgi --config"
         rescue Interrupt => int
-          puts %q[Why did you killed me ? :'(]
+          puts %q"Why did you killed me ? :'("
           exit!
         end
-        @projects_uri = "#{@config[:url]}/api/v4/projects"
+        @config[:projects_url] = "#{@config[:url]}/api/v4/projects"
 
-        req = Net::HTTP::Get.new(@projects_uri)
+        req = Net::HTTP::Get.new(@config[:projects_url])
         req['PRIVATE-TOKEN'] = @token
         res = Net::HTTP.start(@uri.hostname, @uri.port) { |http| http.request(req) }
 
@@ -118,7 +121,7 @@ module Fgi
           exit!
         end
 
-        req = Net::HTTP::Get.new("#{@projects_uri}?search=#{project_name}")
+        req = Net::HTTP::Get.new("#{@config[:projects_url]}?search=#{project_name}")
         req['PRIVATE-TOKEN'] = @token
         res = Net::HTTP.start(@uri.hostname, @uri.port) { |http| http.request(req) }
 
