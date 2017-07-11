@@ -29,6 +29,9 @@ module Fgi
         puts "\n####################################################################"
       end
 
+      # Check the token validity then call the function that save it.
+      # Recursive if the token is invalid.
+      # @param inline_token [String] the given token through `$ fgi --token <token>`
       def validate_and_save_gitlab_token(inline_token = nil)
         begin
           @token = if inline_token.nil?
@@ -65,6 +68,8 @@ module Fgi
 
       private
 
+      # Check the GitLab url validity and save it in a configuration file.
+      # Recursive if the GitLab url is invalid.
       def validate_and_save_gitlab_uri
         puts 'example: http://gitlab.example.com/'
         puts '-----------------------------------'
@@ -88,18 +93,22 @@ module Fgi
         end
       end
 
+      # Write the token in a local file and add it to the .gitignore.
       def save_gitlab_token
         File.open('.gitlab_access_token', 'w') { |f| f.write @token }
         if File.open('.gitignore').grep(/.gitlab_access_token/).empty?
           open('.gitignore', 'a') do |f|
             f.puts ''
-            f.puts '# Gfi secret token for gitlab'
+            f.puts %q(# FGI GitLab's secret token)
             f.puts '.gitlab_access_token'
           end
         end
         puts "\nGitlab secret token successfully saved to file and added to .gitignore."
       end
 
+      # Check for projects titles containing the given keyword then call
+      #   the function that allow to select the right one and save it.
+      # Recursive if the given keyword don't match anything.
       def search_and_save_project
         begin
           project_name = STDIN.gets.chomp
@@ -130,6 +139,9 @@ module Fgi
         end
       end
 
+      # Ask the user to select a project then save its id and full name in a configuration file.
+      # Recursive if the given number don't match any displayed project.
+      # @param results [Hash] the hash containing the found projects informations
       def validate_option(results)
         puts "\nPlease insert the number of the current project :"
         puts '-------------------------------------------------'
@@ -148,12 +160,21 @@ module Fgi
         end
       end
 
+      # In case the user used `$ fgi --token <token>`, initialize some needed variables.
+      def set_config
+        config_file = File.expand_path(CONFIG_FILE)
+        @config = YAML.load_file(config_file)
+        @uri = URI.parse(@config[:url])
+      end
+
+      # Check if the current directory is a git one.
+      # @return [Boolean] true if the current directory is a git one, false otherwise
       def is_git_dir?
         is_git_directory = Dir.exists?('.git')
         if !is_git_directory
           puts %q(This doesn't seem to be the root of a git repository, browse to the root of your project and try again.)
-          return
         end
+        return is_git_directory
       end
     end
   end

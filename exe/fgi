@@ -20,11 +20,11 @@ module Fgi
       case
       when argv.empty?
         Fgi::Helper.run
-      when argv.match(/--help/)
+      when argv.include?('--help')
         Fgi::Helper.run
-      when argv.match(/--config/)
+      when argv.include?('--config')
         Fgi::Configurator.run
-      when argv.match(/--token/)
+      when argv.include?('--token')
         Fgi::Configurator.validate_and_save_gitlab_token(argv.strip.split(' ').last)
       else
         Fgi::GitlabRequest.post_issue(argv)
