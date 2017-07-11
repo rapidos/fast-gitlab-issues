@@ -16,7 +16,7 @@ module Fgi
         # Requested headers to authenticate
         req['PRIVATE-TOKEN'] = TOKEN
 
-        res = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https', debug_output: $stdout) do |http|
+        res = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == 'https', debug_output: $stdout) do |http|
           http.set_debug_output($stdout)
           JSON.parse(http.request(req).body)
         end
